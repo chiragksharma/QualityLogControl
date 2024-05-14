@@ -1,0 +1,16 @@
+{
+    "loggers": {
+        "logger1": {
+            "file": "log1.log",
+            "level": "INFO"
+        },
+        "logger2": {
+            "file": "log2.log",
+            "level": "INFO"
+        },
+        "logger3": {
+            "file": "log3.log",
+            "level": "INFO"
+        }
+    }
+}
