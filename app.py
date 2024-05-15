@@ -13,7 +13,6 @@ app.register_blueprint(logging_bp)
 
 create_index("logs")
 
-BASE_URL = "https://reqres.in/"
 
 @app.get('/test')
 def test_connection():
@@ -55,66 +54,67 @@ def get_api3():
     
     return jsonify(response.json())
 
-# @app.route('/search', methods=['GET'])
-# def search_logs():
-#     query = request.args.get('query')
-#     level = request.args.get('level')
-#     start_time = request.args.get('start_time')
-#     end_time = request.args.get('end_time')
-
-#     es_query = {
-#         "query": {
-#             "bool": {
-#                 "must": [],
-#                 "filter": []
-#             }
-#         }
-#     }
-
-#     if query:
-#         es_query["query"]["bool"]["must"].append({
-#             "match": {
-#                 "log_message": query
-#             }
-#         })
-
-#     if level:
-#         es_query["query"]["bool"]["filter"].append({
-#             "term": {
-#                 "level": level
-#             }
-#         })
-
-#     if start_time and end_time:
-#         es_query["query"]["bool"]["filter"].append({
-#             "range": {
-#                 "timestamp": {
-#                     "gte": start_time,
-#                     "lte": end_time
-#                 }
-#             }
-#         })
-
-#     try:
-#         print("Constructed Query:", es_query)  # Debugging line to check the query
-#         response = es.search(index="logs", body=es_query)
-#         print("Elasticsearch Response:", response)  # Debugging line to check the response
-#         return jsonify(response['hits']['hits'])
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
 @app.route('/search', methods=['GET'])
 def search_logs():
+
+    # Define a basic Elasticsearch query that matches all documents
+    # Get query parameters
+    query = request.args.get('query', '')
+    level = request.args.get('level', '')
+    start_time = request.args.get('start_time', '')
+    end_time = request.args.get('end_time', '')
+
+    # Construct the Elasticsearch query
     es_query = {
         "query": {
-            "match_all": {}
+            "bool": {
+                "must": [],
+                "filter": [],
+            }
         }
     }
 
+    # Add full-text search query
+    if query:
+        es_query["query"]["bool"]["must"].append({
+            "bool": {
+                "should": [
+                    {"match_phrase": {"log_message": query}},
+                    {"match_phrase": {"log_string": query}}
+                ]
+            }
+        })
+
+    # Add level filter
+    if level:
+        es_query["query"]["bool"]["filter"].append({
+            "term": {
+                "level": level
+            }
+        })
+
+    # Add timestamp range filter
+    if start_time and end_time:
+        es_query["query"]["bool"]["filter"].append({
+            "range": {
+                "timestamp": {
+                    "gte": start_time,
+                    "lte": end_time
+                }
+            }
+        })
+
+
     try:
+        # Execute the search query on the "logs" index
         response = es.search(index="logs", body=es_query)
+        # Return the search results as a JSON response
         return jsonify(response['hits']['hits'])
     except Exception as e:
+        # Return an error message if the search fails
         return jsonify({"error": str(e)}), 500
+
+
 def parse_log_line(line):
     """
     Parse a single log line to extract the JSON part.

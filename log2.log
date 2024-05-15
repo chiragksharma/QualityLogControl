@@ -1,0 +1,2 @@
+2024-05-15 15:27:57,175 INFO {"timestamp": "2024-05-15T09:57:57.174324Z", "level": "success", "source": "logger2", "log_message": "API Response", "status_code": 200, "response_text": "{\"id\":4,\"token\":\"QpwL5tke4Pnpja7X4\"}"}
+2024-05-15 15:59:16,564 INFO {"timestamp": "2024-05-15T10:29:16.563947Z", "level": "success", "source": "logger2", "log_message": "API Response", "status_code": 200, "response_text": "{\"id\":4,\"token\":\"QpwL5tke4Pnpja7X4\"}"}
